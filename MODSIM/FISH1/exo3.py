@@ -1,4 +1,5 @@
 import pandas as pd
+#donsload pandas in vscode by typing "pip install pandas" in terminal
 from datetime import datetime, timedelta
 from math import floor
 from time import time
