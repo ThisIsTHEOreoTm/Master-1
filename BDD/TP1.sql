@@ -180,11 +180,13 @@ AFTER INSERT ON sortie
 FOR EACH ROW
 BEGIN
   UPDATE participant
-  SET KmParcourus = KmParcourus + :NEW.distance,
+  --but sortie does not have distance column, we need to join with randonnee table to get the distance
+  SET KmParcourus = KmParcourus + (SELECT distance FROM randonnee WHERE idRando = :NEW.idRando),
       date_modification = CURRENT_TIMESTAMP
   WHERE idParticipant = :NEW.idParticipant;
 END;
 /
+  
 --Créer un trigger qui permet de s’assurer qu’à l’insertion ou à la mise à jour d’une randonnée, celle-ci ne peut être la suite de celle même.
 CREATE OR REPLACE TRIGGER verif_suite_rando
 BEFORE INSERT OR UPDATE ON randonnee
