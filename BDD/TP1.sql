@@ -185,7 +185,14 @@ CREATE OR REPLACE TRIGGER before_delete_participant
 BEFORE DELETE ON participant
 FOR EACH ROW
 BEGIN
-  DELETE FROM sortie WHERE id_participant = :OLD.id;
+  DELETE FROM sortie WHERE idParticipant = :OLD.idParticipant;
+  DBMS_OUTPUT.PUT_LINE('Toutes les sorties du participant avec ID ' || :OLD.idParticipant || ' ont été supprimées.');
+END;
+/
+--test the trigger
+SET SERVEROUTPUT ON;
+BEGIN
+  DELETE FROM participant WHERE nomParticipant = 'Mohamedi';
 END;
 /
 
@@ -198,32 +205,30 @@ DELETE FROM participant WHERE nom = 'Mohamedi';
 ALTER TABLE participant ADD (
   KmParcourus NUMBER DEFAULT 0,
   categorie VARCHAR2(20),
-  date_modification DATE
+  date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---Trigger: mise à jour KmParcourus après insertion d’une sortie
-CREATE OR REPLACE TRIGGER maj_km_apres_sortie
+--Créer un trigger qui permet par l’insertion d’une sortie de modifier la valeur de l’attribut KmParcourus du participant faisant la sortie. La mise a jour consistera ` a ajouter la distance de la randonnee aux kilom ´ etres d ` ej´ a parcourus par le participant
+
+CREATE OR REPLACE TRIGGER mise_a_jour_km
 AFTER INSERT ON sortie
 FOR EACH ROW
 BEGIN
   UPDATE participant
-  SET KmParcourus = KmParcourus + :NEW.distance
-  WHERE id = :NEW.id_participant;
+  --but sortie does not have distance column, we need to join with randonnee table to get the distance
+  SET KmParcourus = KmParcourus + (SELECT distance FROM randonnee WHERE idRando = :NEW.idRando),
+      date_modification = CURRENT_TIMESTAMP
+  WHERE idParticipant = :NEW.idParticipant;
 END;
 /
-
---Trigger: empêcher une randonnée d’être la suite
-CREATE TABLE randonnee (
-  id NUMBER,
-  id_suivante NUMBER
-);
-
-CREATE OR REPLACE TRIGGER verif_randonnee_suivante
+  
+--Créer un trigger qui permet de s’assurer qu’à l’insertion ou à la mise à jour d’une randonnée, celle-ci ne peut être la suite de celle même.
+CREATE OR REPLACE TRIGGER verif_suite_rando
 BEFORE INSERT OR UPDATE ON randonnee
 FOR EACH ROW
 BEGIN
-  IF :NEW.id = :NEW.id_suivante THEN
-    RAISE_APPLICATION_ERROR(-20001, 'Une randonnée ne peut pas être la suite d’elle-même.');
+  IF :NEW.suiteRando = :NEW.idRando THEN
+    RAISE_APPLICATION_ERROR(-20001, 'Une randonnée ne peut pas être sa propre suite.');
   END IF;
 END;
 /
