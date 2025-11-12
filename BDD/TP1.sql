@@ -3,7 +3,7 @@ RETURN NUMBER IS
   f NUMBER := 1;
 BEGIN
   IF n < 0 THEN
-    RETURN NULL;  -- pas de factoriel négatif
+    RETURN NULL;  
   END IF;
   
   FOR i IN 1..n LOOP
@@ -25,10 +25,45 @@ BEGIN
 END;
 /
 
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('Factoriel(5) = ' || factoriel(5));
+  DBMS_OUTPUT.PUT_LINE('Factoriel(0) = ' || factoriel(0));
+  DBMS_OUTPUT.PUT_LINE('Factoriel(-3) = ' || factoriel(-3));
+END;
+/
+--Programme simple affichant "hello world"
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('hello world');
+END;
+/
+--programme a simple variables and IF LOOP
+DECLARE
+  v_name VARCHAR(20) := 'Sofia';
+  v_age NUMBER := 20;
+BEGIN
+  IF v_age >= 18 THEN
+    DBMS_OUTPUT.PUT_LINE(v_name || ' is an adult');
+  ELSE
+    DBMS_OUTPUT.PUT_LINE(v_age || ' is a minor');
+  END IF;
+END;
+/
+
+--Programme avec boucle FOR
+DECLARE
+  v_sum NUMBER := 0;
+  BEGIN
+    FOR i IN 1..10 LOOP
+      v_sum := v_sum + i;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('Sum of first 10 natural numbers is: ' || v_sum);
+  END;
+/
+  
+--next step: demander une valeur à l’utilisateur et calculer son factoriel
 
 --Factorielle d’une valeur donnée par l’utilisateur
 SET SERVEROUTPUT ON;
-
 DECLARE
   n NUMBER;
   res NUMBER;
@@ -41,13 +76,12 @@ END;
 
 --Vérifier si une date tombe le week-end (Vendredi / Samedi)
 SET SERVEROUTPUT ON;
-
 DECLARE
   d DATE := TO_DATE('&date', 'DD/MM/YYYY');
   jour VARCHAR2(20);
 BEGIN
   jour := TO_CHAR(d, 'DAY', 'NLS_DATE_LANGUAGE=FRENCH');
-
+ 
   IF TRIM(jour) IN ('VENDREDI', 'SAMEDI') THEN
     DBMS_OUTPUT.PUT_LINE('C’est le week-end (' || jour || ')');
   ELSE
@@ -89,12 +123,8 @@ EXCEPTION
 END;
 /
 
---Procédure: afficher nom + catégorie d’un participant
-CREATE TABLE participant (
-  id NUMBER,
-  nom VARCHAR2(50),
-  age NUMBER
-);
+
+
 
 CREATE OR REPLACE PROCEDURE afficher_categorie IS
   CURSOR c_part IS SELECT nom, age FROM participant;
@@ -124,6 +154,8 @@ DECLARE
   v_id NUMBER := &id;
   v_nom participant.nom%TYPE;
   v_age participant.age%TYPE;
+  -- %TYPE permet de définir le type de la variable en fonction du type de la colonne dans la table par exemple participant.nom
+  
 BEGIN
   SELECT nom, age INTO v_nom, v_age
   FROM participant
@@ -135,6 +167,12 @@ EXCEPTION
     DBMS_OUTPUT.PUT_LINE('Aucun participant trouvé.');
 END;
 /
+
+-- SELECT object_name
+-- FROM user_objects
+-- WHERE object_type = 'FUNCTION';
+
+
 
 --Trigger avant suppression: supprimer ses sorties
 CREATE TABLE sortie (
@@ -150,6 +188,8 @@ BEGIN
   DELETE FROM sortie WHERE id_participant = :OLD.id;
 END;
 /
+
+
 
 --Test du trigger
 DELETE FROM participant WHERE nom = 'Mohamedi';

@@ -1,0 +1,75 @@
+import sys
+import socket
+import os
+from tkinter import *
+from tkinter import messagebox
+
+# ===========================
+# EXERCICE GUI : Tkinter
+# ===========================
+def gui_mode():
+    def send_message():
+        try:
+            msg = W_Message.get("1.0", END).strip()
+            port = int(W_Port.get())
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
+            s.sendto(msg.encode(), ('localhost', port))
+            W_Message.insert(END, "\nMessage envoyé !\n")
+        except ValueError:
+            messagebox.showerror("Erreur", "Port invalide")
+        except Exception as e:
+            messagebox.showerror("Erreur", str(e))
+
+    fenetre = Tk()
+    fenetre.geometry('370x400')
+    fenetre.title("Client GUI")
+
+    # Label et champ pour le port
+    Label(fenetre, text="Port Serveur:").place(x=10, y=5)
+    W_Port = Entry(fenetre)
+    W_Port.place(x=100, y=5)
+
+    # Zone de texte pour le message
+    W_Message = Text(fenetre, width=40, height=15, font=("Arial", 12))
+    W_Message.place(x=10, y=50)
+
+    # Bouton pour envoyer
+    B_Send = Button(fenetre, text="Envoyer", command=send_message)
+    B_Send.place(x=150, y=350)
+
+    fenetre.mainloop()
+
+# ===========================
+# Choix du mode
+# ===========================
+def console_mode():
+    if len(sys.argv) != 3:
+        print("Usage: python script.py <message> <port>")
+        sys.exit(1)
+
+    message = sys.argv[1]
+
+    try:
+        port_distant = int(sys.argv[2])
+    except ValueError:
+        print("Erreur : le port doit être un entier")
+        sys.exit(1)
+
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
+        s.sendto(message.encode(), ('localhost', port_distant))
+        print("Message envoyé avec succès !")
+    except Exception as e:
+        print("Erreur lors de l'envoi :", e)
+        sys.exit(1)
+
+    # Effacer l’écran
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
+
+if len(sys.argv) > 1:
+    console_mode()  # Si on passe des arguments, on utilise le mode console
+else:
+    gui_mode()      # Sinon, on lance l'interface graphique
