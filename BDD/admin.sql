@@ -11,7 +11,7 @@ CREATE TYPE Personne_t AS OBJECT (
     Tel VARCHAR2(20),
     Email VARCHAR2(50),
     Nss VARCHAR2(20) 
-);
+)NOT FINAL;
 /
 
 CREATE TYPE Enseignant_t UNDER Personne_t (
