@@ -288,7 +288,116 @@ ADD CONSTRAINT fk_seance_dep
     FOREIGN KEY (DepID)
     REFERENCES Departements(DepID);
 
+--insertion of 1000 line in the tables of Etudiants
 
+DECLARE
+  v_nom      VARCHAR2(30);
+  v_prenom   VARCHAR2(30);
+  v_email    VARCHAR2(50);
+    v_tel      VARCHAR2(20);
+    v_nss      VARCHAR2(20);
+    v_datenais DATE;
+    v_villenais VARCHAR2(50);
+    v_prenomPere VARCHAR2(30);
+    v_mere     VARCHAR2(30);
+    v_adr      VARCHAR2(100);
+    v_bac      NUMBER;
+    v_statut   VARCHAR2(20);
+    v_bourse   NUMBER;
+    v_depID    NUMBER;
+BEGIN
+    FOR i IN 1..1000 LOOP
+        v_nom := 'Nom' || i;
+        v_prenom := 'Prenom' || i;
+        v_email := 'email' || i || '@example.com';
+        v_tel := '0123456789';
+        v_nss := 'NSS' || i;
+        v_datenais := TO_DATE('2000-01-01', 'YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365 * 20);
+        v_villenais := 'Ville' || MOD(i, 10);
+        v_prenomPere := 'PrenomPere' || i;
+        v_mere := 'Mere' || i;
+        v_adr := 'Adresse' || i;
+        v_bac := MOD(i, 5) + 1; -- Bac entre 1 et 5
+        v_statut := CASE WHEN MOD(i, 2) = 0 THEN 'Licence' ELSE 'Master' END;
+        v_bourse := CASE WHEN MOD(i, 3) = 0 THEN 1 ELSE 0 END; -- Bourse ou pas
+        v_depID := MOD(i, 10) + 1; -- Départements de 1 à 10
+
+        INSERT INTO Etudiants (Nom, Prenom, Email, Tel, Nss, Datenais, Villenais,
+                               PrenomPere, Mere, Adr, Bac, Statut, Bourse, DepID)
+        VALUES (v_nom, v_prenom, v_email, v_tel, v_nss, v_datenais,
+                v_villenais, v_prenomPere, v_mere, v_adr,
+                v_bac, v_statut, v_bourse, v_depID);
+    END LOOP;
+    COMMIT;
+END;
+/
+--insertion of 300 line in the tables of ensignants
+DECLARE
+    v_nom      VARCHAR2(30);
+    v_prenom   VARCHAR2(30);
+    v_email    VARCHAR2(50);
+    v_tel      VARCHAR2(20);
+    v_nss      VARCHAR2(20);
+    v_datenais DATE;
+    v_villenais VARCHAR2(50);
+    v_prenomPere VARCHAR2(30);
+    v_mere     VARCHAR2(30);
+    v_adr      VARCHAR2(100);
+    v_ensID    NUMBER;
+    v_etatCivil VARCHAR2(20);
+    v_dateRect DATE;
+    v_specialite VARCHAR2(50);
+    v_titre     VARCHAR2(30);
+    v_depID     NUMBER;
+BEGIN
+    FOR i IN 1..300 LOOP
+        v_nom := 'NomEns' || i;
+        v_prenom := 'PrenomEns' || i;
+        v_email := 'emailEns' || i || '@example.com';
+        v_tel := '0123456789';
+        v_nss := 'NSSEns' || i;
+        v_datenais := TO_DATE('1980-01-01', 'YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365 * 40);
+        v_villenais := 'VilleEns' || MOD(i, 10);
+        v_prenomPere := 'PrenomPereEns' || i;
+        v_mere := 'MereEns' || i;
+        v_adr := 'AdresseEns' || i;
+        v_ensID := i;
+        v_etatCivil := CASE WHEN MOD(i, 2) = 0 THEN 'Marié' ELSE 'Célibataire' END;
+        v_dateRect := TO_DATE('2020-01-01', 'YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365 * 3);
+        v_specialite := 'Specialite' || MOD(i, 5);
+        v_titre := CASE WHEN MOD(i, 2) = 0 THEN 'Professeur' ELSE 'Maître de Conférences' END;
+        v_depID := MOD(i, 10) + 1; -- Départements de 1 à 10
+
+        INSERT INTO Enseignants (Nom, Prenom, Email, Tel, Nss, Datenais,
+                                 Villenais, PrenomPere, Mere, Adr,
+                                 EnsID, EtatCivil, DateRect,
+                                 Specialite, Titre, DepID)
+        VALUES (v_nom, v_prenom, v_email, v_tel, v_nss,
+                v_datenais, v_villenais,
+                v_prenomPere, v_mere, v_adr,
+                v_ensID, v_etatCivil,
+                v_dateRect, v_specialite,
+                v_titre, v_depID);
+    END LOOP;
+    COMMIT;
+END;
+
+/
+--insertion of 2 line in the tables of Departements(math et info)
+
+DECLARE
+    v_depID NUMBER;
+    v_nom VARCHAR2(50);
+BEGIN
+    v_depID := 1;
+    v_nom := 'Mathématiques';
+    INSERT INTO Departements (DepID, Nom) VALUES (v_depID, v_nom);
+
+    v_depID := 2;
+    v_nom := 'Informatique';
+    INSERT INTO Departements (DepID, Nom) VALUES (v_depID, v_nom);
+END;
+/
 
 --12.1 starting with fragmentation in the other database in the real machin
 -- username: agent password: agent bddsid: agent
