@@ -93,8 +93,6 @@ CREATE TYPE Departement_t AS OBJECT(
 
 
 --methods implementations
-DROP TYPE BODY Etudiant_t;
-/
 
 CREATE TYPE BODY Etudiant_t AS
 
@@ -435,19 +433,19 @@ END;
 --dans la deuxieme agent
 
 --etudiant fragment for agent
-CREATE TABLE Etudiants_agent OF Etudiant_t
+CREATE TABLE Etudiants_agent 
 AS 
 SELECT VALUE(e) 
 FROM Etudiants@link_to_global e;
   
 --enseignant fragment for agent
-CREATE TABLE Enseignants_agent OF Enseignant_t
+CREATE TABLE Enseignants_agent 
 AS
 SELECT VALUE(en)
 FROM Enseignants@link_to_global en;
 
 --departement fragment for agent
-CREATE TABLE Departements_agent OF Departement_t
+CREATE TABLE Departements_agent 
 AS
 SELECT VALUE(d)
 FROM Departements@link_to_global d;
