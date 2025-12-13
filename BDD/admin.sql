@@ -301,190 +301,133 @@ ADD CONSTRAINT fk_seance_dep
 
 --insertion of 1000 line in the tables of Etudiants
 
-DECLARE
-  v_nom      VARCHAR2(30);
-  v_prenom   VARCHAR2(30);
-  v_email    VARCHAR2(50);
-    v_tel      VARCHAR2(20);
-    v_nss      VARCHAR2(20);
-    v_datenais DATE;
-    v_villenais VARCHAR2(50);
-    v_prenomPere VARCHAR2(30);
-    v_mere     VARCHAR2(30);
-    v_adr      VARCHAR2(100);
-    v_bac      NUMBER;
-    v_statut   VARCHAR2(20);
-    v_bourse   NUMBER;
-    v_depID    NUMBER;
 BEGIN
     FOR i IN 1..1000 LOOP
-        v_nom := 'Nom' || i;
-        v_prenom := 'Prenom' || i;
-        v_email := 'email' || i || '@Etudiant' || i || '.com';
-        v_tel := '0123456789';
-        v_nss := 'NSS' || i;
-        v_datenais := TO_DATE('2000-01-01', 'YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365 * 20);
-        v_villenais := 'Ville' || MOD(i, 10);
-        v_prenomPere := 'PrenomPere' || i;
-        v_mere := 'Mere' || i;
-        v_adr := 'Adresse' || i;
-        v_bac := MOD(i, 10) + 10; -- Bac entre 10 et 19
-        v_statut := CASE WHEN MOD(i, 2) = 0 THEN 'Licence' ELSE 'Master' END;
-        v_bourse := CASE WHEN MOD(i, 3) = 0 THEN 1 ELSE 0 END; -- Bourse ou pas
-        v_depID := MOD(i, 2) + 1; -- Départements de 1 à 2 math ou info
-
-        INSERT INTO Etudiants (Nom, Prenom, Email, Tel, Nss, Datenais, Villenais,
-                               PrenomPere, Mere, Adr, Bac, Statut, Bourse, DepID)
-        VALUES (v_nom, v_prenom, v_email, v_tel, v_nss, v_datenais,
-                v_villenais, v_prenomPere, v_mere, v_adr,
-                v_bac, v_statut, v_bourse, v_depID);
+        INSERT INTO ETUDIANTS_TAB
+        VALUES (
+            Etudiant_t(
+                'Nom' || i,
+                'Prenom' || i,
+                TO_DATE('2000-01-01','YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365*20),
+                'Ville' || MOD(i,10),
+                'PrenomPere' || i,
+                'Mere' || i,
+                'Adresse' || i,
+                '0123456789',
+                'email' || i || '@etudiant.com',
+                'NSS' || i,
+                i, -- EtID
+                SYSDATE,
+                MOD(i,10)+10,
+                CASE WHEN MOD(i,2)=0 THEN 'Licence' ELSE 'Master' END,
+                CASE WHEN MOD(i,3)=0 THEN 1 ELSE 0 END,
+                MOD(i,2)+1
+            )
+        );
     END LOOP;
     COMMIT;
 END;
 /
+
+
 --insertion of 300 line in the tables of ensignants
-DECLARE
-    v_nom      VARCHAR2(30);
-    v_prenom   VARCHAR2(30);
-    v_email    VARCHAR2(50);
-    v_tel      VARCHAR2(20);
-    v_nss      VARCHAR2(20);
-    v_datenais DATE;
-    v_villenais VARCHAR2(50);
-    v_prenomPere VARCHAR2(30);
-    v_mere     VARCHAR2(30);
-    v_adr      VARCHAR2(100);
-    v_ensID    NUMBER;
-    v_etatCivil VARCHAR2(20);
-    v_dateRect DATE;
-    v_specialite VARCHAR2(50);
-    v_titre     VARCHAR2(30);
-    v_depID     NUMBER;
+--correct method
 BEGIN
     FOR i IN 1..300 LOOP
-        v_nom := 'NomEns' || i;
-        v_prenom := 'PrenomEns' || i;
-        v_email := 'emailEns' || i || '@example.com';
-        v_tel := '0123456789';
-        v_nss := 'NSSEns' || i;
-        v_datenais := TO_DATE('1980-01-01', 'YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365 * 40);
-        v_villenais := 'VilleEns' || MOD(i, 10);
-        v_prenomPere := 'PrenomPereEns' || i;
-        v_mere := 'MereEns' || i;
-        v_adr := 'AdresseEns' || i;
-        v_ensID := i;
-        v_etatCivil := CASE WHEN MOD(i, 2) = 0 THEN 'Marié' ELSE 'Célibataire' END;
-        v_dateRect := TO_DATE('2020-01-01', 'YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365 * 3);
-        v_specialite := 'Specialite' || MOD(i, 5);
-        v_titre := CASE WHEN MOD(i, 2) = 0 THEN 'Professeur' ELSE 'Maître de Conférences' END;
-        v_depID := MOD(i, 2) + 1; -- Départements de 1 à 2
-
-        INSERT INTO Enseignants (Nom, Prenom, Email, Tel, Nss, Datenais,
-                                 Villenais, PrenomPere, Mere, Adr,
-                                 EnsID, EtatCivil, DateRect,
-                                 Specialite, Titre, DepID)
-        VALUES (v_nom, v_prenom, v_email, v_tel, v_nss,
-                v_datenais, v_villenais,
-                v_prenomPere, v_mere, v_adr,
-                v_ensID, v_etatCivil,
-                v_dateRect, v_specialite,
-                v_titre, v_depID);
+        INSERT INTO ENSEIGNANTS_TAB
+        VALUES (
+            Enseignant_t(
+                'Nom' || i,
+                'Prenom' || i,
+                TO_DATE('1980-01-01','YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365*20),
+                'Ville' || MOD(i,10),
+                'PrenomPere' || i,
+                'Mere' || i,
+                'Adresse' || i,
+                '0987654321',
+                'email' || i || '@enseignant.com',
+                'NSS' || (i+1000),
+                i, -- EnsID
+                '0123456789',
+                'ens' || i || '@univ.com',
+                CASE WHEN MOD(i,2)=0 THEN 'Célibataire' ELSE 'Marié' END,
+                SYSDATE - DBMS_RANDOM.VALUE(0, 365*5),
+                'Spécialité' || MOD(i,5),
+                CASE WHEN MOD(i,3)=0 THEN 'Professeur' WHEN MOD(i,3)=1 THEN 'Maître de Conférences' ELSE 'Chargé de Cours' END,
+                MOD(i,2)+1
+            )
+        );
     END LOOP;
     COMMIT;
 END;
 
-/
 --insertion of 2 line in the tables of Departements(math et info)
 
-DECLARE
-    v_depID NUMBER;
-    v_nom VARCHAR2(50);
 BEGIN
-    v_depID := 1;
-    v_nom := 'Mathématiques';
-    INSERT INTO Departements (DepID, Nom) VALUES (v_depID, v_nom);
+    INSERT INTO Departements (DepID, DepNom, DepDesig, EnsID)
+    VALUES (1, 'Informatique', 'Département d''Informatique', 1);
 
-    v_depID := 2;
-    v_nom := 'Informatique';
-    INSERT INTO Departements (DepID, Nom) VALUES (v_depID, v_nom);
+    INSERT INTO Departements (DepID, DepNom, DepDesig, EnsID)
+    VALUES (2, 'Mathématiques', 'Département de Mathématiques', 2);
+
+    COMMIT;
 END;
-/
 
 --insertion of 10 line in the tables of Salles
-DECLARE
-    v_sid NUMBER;
-    v_depID NUMBER;
-    v_stype VARCHAR2(20);
-    v_snom VARCHAR2(50);
-    v_nbplaces NUMBER;
-    v_etage NUMBER;
-    v_bloc VARCHAR2(10);
 BEGIN
     FOR i IN 1..10 LOOP
-        v_sid := i;
-        v_depID := MOD(i, 2) + 1; -- Départements de 1 à 2
-        v_stype := CASE WHEN MOD(i, 2) = 0 THEN 'Amphi' ELSE 'TD' END;
-        v_snom := 'Salle' || i;
-        v_nbplaces := 30 + MOD(i, 5) * 10; -- Entre 30 et 70 places
-        v_etage := MOD(i, 3); -- Étages 0 à 2
-        v_bloc := 'B' || MOD(i, 4); -- Blocs B0 à B3
-
-        INSERT INTO Salles (SID, DepID, SType, SNom, NBPlaces, Etage, Bloc)
-        VALUES (v_sid, v_depID, v_stype, v_snom, v_nbplaces, v_etage, v_bloc);
-    END LOOP;
-    COMMIT; 
-END;
-
---insertion of 50 line in the tables of Seances
-DECLARE
-    v_ensID NUMBER;
-    v_etID NUMBER;
-    v_sctype VARCHAR2(10);
-    v_scjour VARCHAR2(10);
-    v_sccreneau VARCHAR2(20);
-    v_descrip VARCHAR2(100);
-    v_sid NUMBER;
-    v_depid NUMBER;
-BEGIN
-    FOR i IN 1..50 LOOP
-        v_ensID := MOD(i, 300) + 1;
-        v_etID := MOD(i, 1000) + 1;
-
-        v_sctype := CASE
-                        WHEN MOD(i, 2) = 0 THEN 'CM'
-                        ELSE 'TD'
-                    END;
-
-        v_scjour := CASE
-                        WHEN MOD(i, 5) = 0 THEN 'Lundi'
-                        WHEN MOD(i, 5) = 1 THEN 'Mardi'
-                        WHEN MOD(i, 5) = 2 THEN 'Mercredi'
-                        WHEN MOD(i, 5) = 3 THEN 'Jeudi'
-                        ELSE 'Vendredi'
-                    END;
-
-        v_sccreneau := CASE
-                           WHEN MOD(i, 3) = 0 THEN '08:00-10:00'
-                           WHEN MOD(i, 3) = 1 THEN '10:00-12:00'
-                           ELSE '14:00-16:00'
-                       END;
-
-        v_descrip := 'Description de la séance ' || i;
-        v_sid := MOD(i, 10) + 1;
-        v_depid := MOD(i, 2) + 1;
-
-        INSERT INTO Seances (
-            EnsID, EtID, ScType, ScJour, ScCreneau, Descrip, SID, DepID
+        INSERT INTO Salles (
+            SID, DepID, SType, SNom, NBPlaces, Etage, Bloc
         )
         VALUES (
-            v_ensID, v_etID, v_sctype, v_scjour,
-            v_sccreneau, v_descrip, v_sid, v_depid
+            i,
+            MOD(i,2)+1,
+            CASE
+                WHEN MOD(i,2)=0 THEN 'Amphithéâtre'
+                ELSE 'Salle de TP'
+            END,
+            'Salle ' || i,
+            MOD(i,100)+20,
+            MOD(i,5)+1,
+            CHR(64 + MOD(i,3)+1) -- Bloc A, B, C
         );
     END LOOP;
 
     COMMIT;
 END;
-/
+--insertion of 50 line in the tables of Seances
+BEGIN
+    FOR i IN 1..50 LOOP
+        INSERT INTO Seances (
+            EnsID, EtID, ScType, ScJour, ScCreneau, Descrip, SID, DepID
+        )
+        VALUES (
+            MOD(i,300)+1,
+            MOD(i,1000)+1,
+            CASE
+                WHEN MOD(i,2)=0 THEN 'CM'
+                ELSE 'TD'
+            END,
+            CASE
+                WHEN MOD(i,5)=0 THEN 'Lundi'
+                WHEN MOD(i,5)=1 THEN 'Mardi'
+                WHEN MOD(i,5)=2 THEN 'Mercredi'
+                WHEN MOD(i,5)=3 THEN 'Jeudi'
+                ELSE 'Vendredi'
+            END,
+            CASE
+                WHEN MOD(i,3)=0 THEN '08:00-10:00'
+                WHEN MOD(i,3)=1 THEN '10:00-12:00'
+                ELSE '14:00-16:00'
+            END,
+            'Description de la séance ' || i,
+            MOD(i,10)+1,
+            MOD(i,2)+1
+        );
+    END LOOP;
+
+    COMMIT;
+END;
 
 
 --12.1 starting with fragmentation in the other database in the real machin
@@ -575,9 +518,51 @@ SELECT VALUE(d)
 FROM Departements@link_real d
 WHERE d.DepID = 2;
 
-
---vue globale 
+------vue all in admin
+--global ETUDIANT view
 CREATE OR REPLACE VIEW Etudiant_Global AS
-SELECT VALUE(e) FROM Etudiants_Info@link_real e
+SELECT *
+FROM Etudiant_Info@link_vm1
 UNION ALL
-SELECT VALUE(e) FROM Etudiants_Math@link_real e;
+SELECT *
+FROM Etudiant_Math@link_vm2;
+--global ENSEIGNANT view
+CREATE OR REPLACE VIEW Enseignant_Global AS
+SELECT *
+FROM Enseignant_Info@link_vm1
+UNION ALL
+SELECT *
+FROM Enseignant_Math@link_vm2;
+--global salle view
+CREATE OR REPLACE VIEW Salle_Global AS
+SELECT *
+FROM Salle_Info@link_vm1
+UNION ALL
+SELECT *
+FROM Salle_Math@link_vm2;
+
+--Views WITH UPDATE
+CREATE OR REPLACE TRIGGER trg_insert_etudiant_global
+INSTEAD OF INSERT ON Etudiants
+FOR EACH ROW
+BEGIN
+  IF :NEW.DepID = 1 THEN
+    INSERT INTO Etudiant_Info@link_vm1 VALUES (:NEW);
+  ELSIF :NEW.DepID = 2 THEN
+    INSERT INTO Etudiant_Math@link_vm2 VALUES (:NEW);
+  END IF;
+END;
+/
+
+
+
+--test
+SELECT COUNT(*) FROM Etudiant_Global;
+--compare with:
+SELECT COUNT(*) FROM Etudiant_Info@link_info
+     + COUNT(*) FROM Etudiant_Math@link_math;
+
+
+
+
+
