@@ -545,9 +545,9 @@ INSTEAD OF INSERT ON Etudiants
 FOR EACH ROW
 BEGIN
   IF :NEW.DepID = 1 THEN
-    INSERT INTO Etudiant_Info@link_vm1 VALUES (:NEW);
+    INSERT INTO Etudiant@link_vm1 VALUES (:NEW);
   ELSIF :NEW.DepID = 2 THEN
-    INSERT INTO Etudiant_Math@link_vm2 VALUES (:NEW);
+    INSERT INTO Etudiant@link_vm2 VALUES (:NEW);
   END IF;
 END;
 /
