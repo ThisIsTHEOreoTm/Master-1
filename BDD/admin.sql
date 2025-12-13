@@ -433,88 +433,88 @@ END;
 --dans la deuxieme agent
 
 --etudiant fragment for agent
-CREATE TABLE Etudiants_agent 
-AS 
-SELECT VALUE(e) 
-FROM Etudiants@link_to_global e;
-  
+
+CREATE TABLE Etudiants_agent AS
+SELECT *
+FROM Etudiants@link_real1;
+
 --enseignant fragment for agent
-CREATE TABLE Enseignants_agent 
-AS
-SELECT VALUE(en)
-FROM Enseignants@link_to_global en;
+CREATE TABLE Enseignants_agent AS
+SELECT *
+FROM Enseignants@link_real1 en;
 
 --departement fragment for agent
-CREATE TABLE Departements_agent 
-AS
-SELECT VALUE(d)
+CREATE TABLE Departements_agent AS
+SELECT *
 FROM Departements@link_to_global d;
 
 -------------------------------------------------
 --VM1 de frpartment informatique
-CREATE TABLE Etudiants_Info OF Etudiant_t
-AS
-SELECT VALUE(e)
-FROM Etudiants@link_real -- assuming link_real points to the global DB
-WHERE e.DepID = 1;
 
-CREATE TABLE Enseignants_Info OF Enseignant_t
-AS
-SELECT VALUE(en)
-FROM Enseignants@link_real en
-WHERE en.DepID = 1;
+-- Fragmentation horizontale des étudiants du département informatique
+CREATE TABLE Etudiant AS
+SELECT EtID, Nom, Prenom, Datenais, Villenais, Adr, Email, DateInsc, Bac, Statut , DepID
+FROM Etudiants@link_to_etud
+WHERE DepID = 1;
 
+-- Fragmentation horizontale des enseignants du département informatique
+CREATE TABLE Enseignant AS
+SELECT EnsID, Nom, Prenom, Datenais, Villenais, Adr, Email, DateRect, Specialite, Titre, DepID
+FROM Enseignants@link_to_etud
+WHERE DepID = 1;
 
-CREATE TABLE Salles_Info OF Salle_t
-AS
-SELECT VALUE(s)
-FROM Salles@link_real s
-WHERE s.DepID = 1;
+-- Fragmentation locale des salles
+CREATE TABLE Salle AS
+SELECT *
+FROM Salles@link_to_etud
+WHERE DepID = 1;
 
-CREATE TABLE Seances_Info OF Seance_t
-AS
-SELECT VALUE(sc)
-FROM Seances@link_real sc
-WHERE sc.DepID = 1;
+-- Fragmentation locale des séances
+CREATE TABLE Seance AS
+SELECT *
+FROM Seances@link_to_etud
+WHERE DepID = 1;
 
-CREATE TABLE Departements_Info OF Departement_t
-AS
-SELECT VALUE(d)
-FROM Departements@link_real d
-WHERE d.DepID = 1;
+-- Fragmentation département
+CREATE TABLE Departement AS
+SELECT *
+FROM Departements@link_to_etud
+WHERE DepID = 1;
+
 -------------------------------------------------
 --VM2 de frpartment mathématiques
-CREATE TABLE Etudiants_Math OF Etudiant_t
-AS
-SELECT VALUE(e)
-FROM Etudiants@link_real e
-WHERE e.DepID = 2;
+CREATE TABLE Etudiant AS
+--SELECT EtID, EtNom, EtPrenom, EtDatenais,EtVillenais, EtAdr, Etemail, EtDateInsc, EtBac, EtStatut , DepID
+SELECT EtID, Nom, Prenom, Datenais, Villenais, Adr, Email, DateInsc, Bac, Statut , DepID    
+FROM Etudiants@link_to_etud
+WHERE DepID = 2;
 
-CREATE TABLE Enseignants_Math OF Enseignant_t
-AS
-SELECT VALUE(en)
-FROM Enseignants@link_real en
-WHERE en.DepID = 2;
+-- Fragmentation horizontale des enseignants du département informatique
+CREATE TABLE Enseignant AS
+SELECT EnsID, Nom, Prenom, Datenais, Villenais, Adr, Email, DateRect, Specialite, Titre, DepID
+FROM Enseignants@link_to_etud
+WHERE DepID = 2;
 
-CREATE TABLE Salles_Math OF Salle_t
-AS
-SELECT VALUE(s)
-FROM Salles@link_real s
-WHERE s.DepID = 2;
+-- Fragmentation locale des salles
+CREATE TABLE Salle AS
+SELECT *
+FROM Salles@link_to_etud
+WHERE DepID = 2;
+
+-- Fragmentation locale des séances
+CREATE TABLE Seance AS
+SELECT *
+FROM Seances@link_to_etud
+WHERE DepID = 2;
+
+-- Fragmentation département
+CREATE TABLE Departement AS
+SELECT *
+FROM Departements@link_to_etud
+WHERE DepID = 2;
 
 
-CREATE TABLE Salles_Math OF Salle_t
-AS
-SELECT VALUE(s)
-FROM Salles@link_real s
-WHERE s.DepID = 2;
 
-
-CREATE TABLE Departements_Math OF Departement_t
-AS
-SELECT VALUE(d)
-FROM Departements@link_real d
-WHERE d.DepID = 2;
 
 ------vue all in admin
 --global ETUDIANT view
