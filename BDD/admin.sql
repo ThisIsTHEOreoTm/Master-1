@@ -90,7 +90,12 @@ CREATE TYPE Departement_t AS OBJECT(
     MEMBER PROCEDURE ajouterMembre(personneID NUMBER)
 );
 /
+
+
 --methods implementations
+DROP TYPE BODY Etudiant_t;
+/
+
 CREATE TYPE BODY Etudiant_t AS
 
     MEMBER PROCEDURE inscrire(scID NUMBER) IS
@@ -101,7 +106,9 @@ CREATE TYPE BODY Etudiant_t AS
 
     MEMBER PROCEDURE changerNiveau(nouveauStatut VARCHAR2) IS
     BEGIN
-        SELF.Statut := nouveauStatut;
+        UPDATE ETUDIANTS_TAB e
+        SET e.Statut = nouveauStatut
+        WHERE e.EtID = SELF.EtID;
     END changerNiveau;
 
     MEMBER FUNCTION afficherInfos RETURN VARCHAR2 IS
@@ -113,12 +120,16 @@ CREATE TYPE BODY Etudiant_t AS
 
     MEMBER PROCEDURE payerFrais(montant NUMBER) IS
     BEGIN
-        DBMS_OUTPUT.PUT_LINE('Paiement de ' || montant || ' DA effectué pour ' || SELF.Nom);
+        DBMS_OUTPUT.PUT_LINE(
+            'Paiement de ' || montant || ' DA effectué pour ' || SELF.Nom
+        );
     END payerFrais;
 
 END;
 /
 
+--fixing the same for Enseignant_t
+DROP TYPE BODY Enseignant_t;
 
 CREATE TYPE BODY Enseignant_t AS
 
@@ -309,7 +320,7 @@ BEGIN
     FOR i IN 1..1000 LOOP
         v_nom := 'Nom' || i;
         v_prenom := 'Prenom' || i;
-        v_email := 'email' || i || '@example.com';
+        v_email := 'email' || i || '@Etudiant' || i || '.com';
         v_tel := '0123456789';
         v_nss := 'NSS' || i;
         v_datenais := TO_DATE('2000-01-01', 'YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365 * 20);
@@ -317,10 +328,10 @@ BEGIN
         v_prenomPere := 'PrenomPere' || i;
         v_mere := 'Mere' || i;
         v_adr := 'Adresse' || i;
-        v_bac := MOD(i, 5) + 1; -- Bac entre 1 et 5
+        v_bac := MOD(i, 10) + 10; -- Bac entre 10 et 19
         v_statut := CASE WHEN MOD(i, 2) = 0 THEN 'Licence' ELSE 'Master' END;
         v_bourse := CASE WHEN MOD(i, 3) = 0 THEN 1 ELSE 0 END; -- Bourse ou pas
-        v_depID := MOD(i, 10) + 1; -- Départements de 1 à 10
+        v_depID := MOD(i, 2) + 1; -- Départements de 1 à 2 math ou info
 
         INSERT INTO Etudiants (Nom, Prenom, Email, Tel, Nss, Datenais, Villenais,
                                PrenomPere, Mere, Adr, Bac, Statut, Bourse, DepID)
@@ -366,7 +377,7 @@ BEGIN
         v_dateRect := TO_DATE('2020-01-01', 'YYYY-MM-DD') + DBMS_RANDOM.VALUE(0, 365 * 3);
         v_specialite := 'Specialite' || MOD(i, 5);
         v_titre := CASE WHEN MOD(i, 2) = 0 THEN 'Professeur' ELSE 'Maître de Conférences' END;
-        v_depID := MOD(i, 10) + 1; -- Départements de 1 à 10
+        v_depID := MOD(i, 2) + 1; -- Départements de 1 à 2
 
         INSERT INTO Enseignants (Nom, Prenom, Email, Tel, Nss, Datenais,
                                  Villenais, PrenomPere, Mere, Adr,
@@ -399,7 +410,174 @@ BEGIN
 END;
 /
 
+--insertion of 10 line in the tables of Salles
+DECLARE
+    v_sid NUMBER;
+    v_depID NUMBER;
+    v_stype VARCHAR2(20);
+    v_snom VARCHAR2(50);
+    v_nbplaces NUMBER;
+    v_etage NUMBER;
+    v_bloc VARCHAR2(10);
+BEGIN
+    FOR i IN 1..10 LOOP
+        v_sid := i;
+        v_depID := MOD(i, 2) + 1; -- Départements de 1 à 2
+        v_stype := CASE WHEN MOD(i, 2) = 0 THEN 'Amphi' ELSE 'TD' END;
+        v_snom := 'Salle' || i;
+        v_nbplaces := 30 + MOD(i, 5) * 10; -- Entre 30 et 70 places
+        v_etage := MOD(i, 3); -- Étages 0 à 2
+        v_bloc := 'B' || MOD(i, 4); -- Blocs B0 à B3
+
+        INSERT INTO Salles (SID, DepID, SType, SNom, NBPlaces, Etage, Bloc)
+        VALUES (v_sid, v_depID, v_stype, v_snom, v_nbplaces, v_etage, v_bloc);
+    END LOOP;
+    COMMIT; 
+END;
+
+--insertion of 50 line in the tables of Seances
+DECLARE
+    v_ensID NUMBER;
+    v_etID NUMBER;
+    v_sctype VARCHAR2(10);
+    v_scjour VARCHAR2(10);
+    v_sccreneau VARCHAR2(20);
+    v_descrip VARCHAR2(100);
+    v_sid NUMBER;
+    v_depid NUMBER;
+BEGIN
+    FOR i IN 1..50 LOOP
+        v_ensID := MOD(i, 300) + 1;
+        v_etID := MOD(i, 1000) + 1;
+
+        v_sctype := CASE
+                        WHEN MOD(i, 2) = 0 THEN 'CM'
+                        ELSE 'TD'
+                    END;
+
+        v_scjour := CASE
+                        WHEN MOD(i, 5) = 0 THEN 'Lundi'
+                        WHEN MOD(i, 5) = 1 THEN 'Mardi'
+                        WHEN MOD(i, 5) = 2 THEN 'Mercredi'
+                        WHEN MOD(i, 5) = 3 THEN 'Jeudi'
+                        ELSE 'Vendredi'
+                    END;
+
+        v_sccreneau := CASE
+                           WHEN MOD(i, 3) = 0 THEN '08:00-10:00'
+                           WHEN MOD(i, 3) = 1 THEN '10:00-12:00'
+                           ELSE '14:00-16:00'
+                       END;
+
+        v_descrip := 'Description de la séance ' || i;
+        v_sid := MOD(i, 10) + 1;
+        v_depid := MOD(i, 2) + 1;
+
+        INSERT INTO Seances (
+            EnsID, EtID, ScType, ScJour, ScCreneau, Descrip, SID, DepID
+        )
+        VALUES (
+            v_ensID, v_etID, v_sctype, v_scjour,
+            v_sccreneau, v_descrip, v_sid, v_depid
+        );
+    END LOOP;
+
+    COMMIT;
+END;
+/
+
+
 --12.1 starting with fragmentation in the other database in the real machin
 -- username: agent password: agent bddsid: agent
+--dans la deuxieme agent
+
+--etudiant fragment for agent
+CREATE TABLE Etudiants_agent OF Etudiant_t
+AS 
+SELECT VALUE(e) 
+FROM Etudiants@link_to_global e;
+  
+--enseignant fragment for agent
+CREATE TABLE Enseignants_agent OF Enseignant_t
+AS
+SELECT VALUE(en)
+FROM Enseignants@link_to_global en;
+
+--departement fragment for agent
+CREATE TABLE Departements_agent OF Departement_t
+AS
+SELECT VALUE(d)
+FROM Departements@link_to_global d;
+
+-------------------------------------------------
+--VM1 de frpartment informatique
+CREATE TABLE Etudiants_Info OF Etudiant_t
+AS
+SELECT VALUE(e)
+FROM Etudiants@link_real -- assuming link_real points to the global DB
+WHERE e.DepID = 1;
+
+CREATE TABLE Enseignants_Info OF Enseignant_t
+AS
+SELECT VALUE(en)
+FROM Enseignants@link_real en
+WHERE en.DepID = 1;
 
 
+CREATE TABLE Salles_Info OF Salle_t
+AS
+SELECT VALUE(s)
+FROM Salles@link_real s
+WHERE s.DepID = 1;
+
+CREATE TABLE Seances_Info OF Seance_t
+AS
+SELECT VALUE(sc)
+FROM Seances@link_real sc
+WHERE sc.DepID = 1;
+
+CREATE TABLE Departements_Info OF Departement_t
+AS
+SELECT VALUE(d)
+FROM Departements@link_real d
+WHERE d.DepID = 1;
+-------------------------------------------------
+--VM2 de frpartment mathématiques
+CREATE TABLE Etudiants_Math OF Etudiant_t
+AS
+SELECT VALUE(e)
+FROM Etudiants@link_real e
+WHERE e.DepID = 2;
+
+CREATE TABLE Enseignants_Math OF Enseignant_t
+AS
+SELECT VALUE(en)
+FROM Enseignants@link_real en
+WHERE en.DepID = 2;
+
+CREATE TABLE Salles_Math OF Salle_t
+AS
+SELECT VALUE(s)
+FROM Salles@link_real s
+WHERE s.DepID = 2;
+
+
+CREATE TABLE Salles_Math OF Salle_t
+AS
+SELECT VALUE(s)
+FROM Salles@link_real s
+WHERE s.DepID = 2;
+
+
+CREATE TABLE Departements_Math OF Departement_t
+AS
+SELECT VALUE(d)
+FROM Departements@link_real d
+WHERE d.DepID = 2;
+
+
+--vue globale 
+CREATE OR REPLACE VIEW Etudiant_Global AS
+SELECT VALUE(e) FROM Etudiants_Info@link_real e
+UNION ALL
+SELECT VALUE(e) FROM Etudiants_Math@link_real e;
