@@ -303,7 +303,7 @@ ADD CONSTRAINT fk_seance_dep
 
 BEGIN
     FOR i IN 1..1000 LOOP
-        INSERT INTO ETUDIANTS_TAB
+        INSERT INTO Etudiants
         VALUES (
             Etudiant_t(
                 'Nom' || i,
@@ -334,7 +334,7 @@ END;
 --correct method
 BEGIN
     FOR i IN 1..300 LOOP
-        INSERT INTO ENSEIGNANTS_TAB
+        INSERT INTO Enseignants
         VALUES (
             Enseignant_t(
                 'Nom' || i,
@@ -431,7 +431,7 @@ END;
 
 
 --12.1 starting with fragmentation in the other database in the real machin
--- username: agent password: agent bddsid: agent
+-- username: agent password: agent bddsid: skibidi toilet
 --dans la deuxieme agent
 
 --etudiant fragment for agent
@@ -559,8 +559,8 @@ END;
 --test
 SELECT COUNT(*) FROM Etudiant_Global;
 --compare with:
-SELECT COUNT(*) FROM Etudiant_Info@link_info
-     + COUNT(*) FROM Etudiant_Math@link_math;
+-- SELECT COUNT(*) FROM Etudiant_Info@link_info
+--      + COUNT(*) FROM Etudiant_Math@link_math;
 
 
 
